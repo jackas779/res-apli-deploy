@@ -1,0 +1,37 @@
+### traer todas la peliculas
+GET http://localhost:1234/movies
+
+### traer todas la peliculas con paginacion
+GET http://localhost:1234/movies?pag=10
+
+
+### pedir peliculas con un filtro de genero
+GET http://localhost:1234/movies?genero=DRAMA
+
+### crear una pelicula 
+POST http://localhost:1234/movies
+Content-Type: application/json
+
+{
+  "title": "The office",
+  "year" : 2024,
+  "director" : "Jhohanes Burgo",
+  "duration" : 20,
+  "poster": "https://img.fruugo.com/product/4/49/14441494_max.jpg",
+  "genre": [
+    "Crime",
+    "Drama"
+  ]
+}
+
+### Actualizar una película
+PATCH http://localhost:1234/movies/dcdd0fad-a94c-4810-8acc-5f108d3b18c3
+Content-Type: application/json
+
+{
+  "year": 1999
+}
+
+
+### Eliminar una peli
+DELETE  http://localhost:1234/movies/dcdd0fad-a94c-4810-8acc-5f108d3b18c

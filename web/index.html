@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Api</title>
+  <style>
+    article {
+      border: 1px solid #ccc;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    img {
+      height: auto;
+      width: 250px;
+      max-width: 100%;
+      max-height: 370px;
+    }
+    .pagination a {
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .pagination a {
+      display: inline-block;
+      padding: 8px 16px;
+      text-decoration: none;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      color: #333;
+      margin: 4px;
+    }
+
+    .pagination a:hover {
+      background-color: #f1f1f1;
+    }
+
+    .pagination a.active {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .actual{
+      background: #42aedc;
+      color: white;
+    }
+
+
+  </style>
+
+  <script>
+    function showsMovies(pages=1){
+      fetch('http://localhost:1234/movies?pag='+pages)
+      .then(response => {
+        if(response.status == 200){
+          return response.json()
+        }
+      })
+      .then(movies =>{
+        const html = movies.map(movie => {
+          if(movie.id !== undefined){
+            return `
+              <article data-id="${movie.id}">
+                <h2>${movie.title}</h2>
+                <img src="${movie.poster}" alt="${movie.title}">
+                <p>${movie.year}</p>
+                <button>Eliminar</button>
+              </article>
+            `
+          }else{
+            // return`<article data-id="paginacion" class='paginacion'>${movie.paginas}</article>`
+            return createPagination(movie)
+          }
+        }).join('')
+
+        document.querySelector('main').innerHTML = html
+      })
+    }
+
+    function showsPages ({paginas,pagAct}){
+      let html = ''
+      for (let index = 1; index <= parseInt(paginas) ; index++) {
+        if(index === parseInt(pagAct)){
+          html += `<li><a class='actual' onclick='showsMovies(${index})'>${index}</a></li>`
+        }else{
+          html += `<li><a onclick='showsMovies(${index})'>${index}</a></li>`
+        }
+      }
+
+      return `<article id='paginas'><ul class="pagination">${html}</ul></article>`
+    }
+
+    function createPagination({paginas, pagAct}) {
+      const pages = [];
+
+      for (let i = 1; i <= paginas; i++) {
+        const pageClass = i === parseInt(pagAct) ? 'active' : '';
+        pages.push(`<li><a class="${pageClass}" onclick='showsMovies(${i})'>${i}</a></li>`);
+      }
+
+      return `<article id="paginas"><ul class="pagination">${pages.join('')}</ul></article>`;
+    }
+
+    
+    document.addEventListener('click', e => {
+      if (e.target.matches('button')) {
+        const article = e.target.closest('article')
+        const id = article.dataset.id
+
+        fetch(`http://localhost:1234/movies/${id}`, {
+          method: 'DELETE'
+        })
+        .then(res => {
+          if (res.ok) {
+            article.remove()
+          }
+        })
+      }
+    })
+
+    showsMovies(1)
+  </script>
+</head>
+<body>
+
+  <main> </main>
+  
+</body>
+</html>
